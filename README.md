@@ -49,6 +49,7 @@ microsoft-powerbi-javascript-example
 ├── hard-coded-example.html
 ├── input-form-dashboard-example.html
 ├── input-form-report-example.html
+├── LICENSE
 ├── power-bi.js
 └── power-bi.min.js
 ```
