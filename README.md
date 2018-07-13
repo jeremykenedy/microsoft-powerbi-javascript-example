@@ -7,7 +7,6 @@ Table of Contents:
 - [Libraries Used](#Libraries-used)
 - [File Tree](#file-tree)
 - [Resources](#resources)
-- [Notes](#notes)
 - [License](#license)
 
 ## About
