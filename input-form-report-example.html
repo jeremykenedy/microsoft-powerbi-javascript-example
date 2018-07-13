@@ -1,0 +1,119 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>PowerBi Embeded Example</title>
+    </head>
+    <body>
+        <h1>
+            PowerBi Embeded Example
+        </h1>
+
+        <form id="powerBiForm" name="powerBiForm" onsubmit="return triggerReport()" method="get">
+            <div>
+                <label for="exampleEmbededURL">exampleEmbededURL:</label>
+                <input type="text" name="exampleEmbededURL" value="" id="exampleEmbededURL" placeholder="exampleEmbededURL" required>
+            </div>
+            <div>
+                <label for="exampleGroupId">exampleGroupId:</label>
+                <input type="text" name="exampleGroupId" value="" id="exampleGroupId" placeholder="exampleGroupId" required>
+            </div>
+            <div>
+                <label for="exampleReportId">exampleReportId:</label>
+                <input type="text" name="exampleReportId" value="" id="exampleReportId" placeholder="exampleReportId" required>
+            </div>
+            <div>
+                <label for="exampleToken">exampleToken:</label>
+                <textarea name="exampleToken" value="" id="exampleToken" placeholder="exampleToken" required></textarea>
+            </div>
+            <br>
+            <button type="button" id='autoPopulateForm' onclick="return autopopulate(event)">Autopopulate Form</button>
+            <input type="submit" name="submit" value="Submit From"/>
+        </form>
+
+        <div id="reportContainer"></div>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="power-bi.js"></script>
+
+        <script type="text/javascript">
+
+            function fetchandLoadReport() {
+
+                // Read Example values from form inputs
+                var exampleToken = $('#exampleToken').val();
+                var exampleEmbededURL = $('#exampleEmbededURL').val();
+                var exampleGroupId = $('#exampleGroupId').val();
+                var exampleReportId = $('#exampleReportId').val();
+
+                // Get models. models contains enums that can be used.
+                var models = window['powerbi-client'].models;
+
+                // We give All permissions to demonstrate switching between View and Edit mode and saving report.
+                var permissions = models.Permissions.All;
+
+                var config= {
+                    type: 'report',
+                    tokenType: models.TokenType.Embed,
+                    accessToken: exampleToken,
+                    embedUrl: exampleEmbededURL + '?reportId=' + exampleReportId + '&groupId=' + exampleGroupId,
+                    id: exampleReportId,
+                    permissions: permissions,
+                    settings: {
+                        filterPaneEnabled: true,
+                        navContentPaneEnabled: true
+                    }
+                };
+
+                // // Get a reference to the embedded dashboard HTML element
+                var reportContainer = $('#reportContainer');
+                var report = powerbi.embed(reportContainer.get(0), config);
+
+                // Report.off removes a given event handler if it exists.
+                report.off("loaded");
+
+                // Report.on will add an event handler which prints to Log window.
+                report.on("loaded", function() {
+                    // Log.logText("Loaded");
+                    console.log("Loaded");
+                });
+
+                report.on("error", function(event) {
+                    // Log.log(event.detail);
+                    console.log(event.detail);
+                    alert(event.detail.detailedMessage);
+                    report.off("error");
+                });
+
+                report.off("saved");
+                report.on("saved", function(event) {
+                    Log.log(event.detail);
+                    if(event.detail.saveAs) {
+                        console.log('In order to interact with the new report, create a new token and load the new report')
+                        // Log.logText('In order to interact with the new report, create a new token and load the new report');
+                    }
+                });
+            }
+
+            function triggerReport() {
+                fetchandLoadReport();
+                return false;
+            }
+
+            function autopopulate(event) {
+                event.preventDefault();
+
+                // Harded coded values pulled from example docs @https://microsoft.github.io/PowerBI-JavaScript/demo/v2-demo/index.html#
+                var exampleToken = 'H4sIAAAAAAAEAB2VxQ60WBqG7-Xf0glQeCe9wN2dHQ6Fu0zm3qem919yTl57_vPHSp9-Sos_f__ZNCBdQUF50XmfavkoCHnvxohFIYsjGNbpQES23buJn5CkKxcR-ziwaVhwjQ8dhrl6uir8LqsSiO-ouqvKVo1TlwpJfZpCATn9mC58rB1DnWerGS7EcZnAqDervRzBde-va_MwG1KJUcwT-c7eCBBcmnn63ks4MSG1ofE-WESS4UlKb2kwGJnksK17Q83u3Cl7YYGWoukECy_5LjCrsDw4AqUk6q-cNIKnTrgB0i7SpDjCS0vDNip1rZOmdqEx7F6OCDfw-A4nDWXVlJW5uC3E3rJfEy6I_VnivEvGwDcFp9pWIod6u80ryU35bnFEsReJm0PDtywo4NUNOFjBmPqqFuu4fKNGLKet8pQ_-Er5zXy1dGVwsRw4-OiVvKDlwbDpNAkNY-nQqNFU7F2LMlBLsGtRtE82-5vdk_06u0RZsxi7oPPEfXRl2DHuycA6PQvjVwP8bCowBRZ6cJwfclKkR2KYWCwzQWdZcZX9djHni4qT2j5toiDrpLQIe7VYs-idIYH5ceVH28_IWxNP23abGb5YCAhF2jdxt1jcArqAVcSirScA17LoGiuJSfs6n6fWvIhuR9A4nn161EB51AXyA4RGUvB4CQ4K402zFK4Un2pXlLwTVisW9vcUJw-s6SJ2YDUu757oPhro4u111XrOkz4y7y-q0DZIlxNtTBtxU1BD8NtAytoXky-PEAyXKRmfB91SjKHjOWPp22g62G08AJ1G63GylrkAZ4vOKg12gfM_VSrPjrnm7ehfHLQI1bOpWnZ8QFzZX1or9hvZpQh8URZmU1w2JDt2rsgapmv81WmVOlfFcYoMtRqpEEQCvBIbBSOLo-MAoqUoSIO6HtmC6sIKxgiZRQS0tcT94IeAL1DzwvRqywj70RFVYWMif-IJXDPu5WKqN9TOYzNBpPQOV3mOWvBFtt5FA7qTtN8vbmfot1jyfmUx0226sEthdXhr-4KU27grp_LPem0tRv1VcEmMixhKVreO2WYZgnXTUmcQ8kEcYMGFru2bpRuLO_0E50R5gZ1-BWvF3TvDFBBFr2r1T11AfwH2_IicRz7NQQA67JrYRUjBA0TNiY86rWFuk5xsLULgajhBVB-lSV1asCBd-JysTU4uDjREqnef06pd3IKhHsOahWaJwuhUXSVycFmr6gTSluEZ4fuQDmussEEV8pJxaUt6UBsITvbBMKAcBuWgNgq95wyTFZE9IzTsLH94465KKAAxRZivclP1YsW3LHwegNwQvmzWjZxIfvnriglgtnyXUGE9j9rjJvipnRBY4ruNEE0r7NbO5N0CkLXINBG_5u2lUBHnVsjbg_emcN-fadoZRcQLLj221R6vORePkEi-XB3cKSGsjksOeQF3zwjl1LEmh6RPsybaLgk2r2Fd096LpOP0LWQdUjGpkMR1n2lKZQ8IInxgg_XHhR8PzbjxKvKS6iDxIYSrPOeyoZNt1_XdvdhriVIBiVel61tKFYteWOcVO3Z_I7-YS_tP69Lg3RuGPLLQd3CDEeaSxklob2nSiebXBBNTVTRijm17lK2w45KCcoPi84NKltJ_CfvL2sk03GhdOh9mRhqbMGnq-CBe60UK_6vfCwRRz5snfQyTxA2cOsS-zIBWfHyOTyAmBpSqO88rBrDG2fLCoW_6LZJuYCbyrgFqua1CjP_d6s2BzpUJIlacvqp4lQ6Tx9-U8wioALvUhp7Z2NolZUYXH0AwE-bBwbFMIIczv2i9tUhTmU2Ppb3fSHQPCV1NkbyhSdAnn3CBpu9LWcYIIxdk-xASfciK0ZlS9rC3V-MEHYKBdWG1aC9udGl4z1p45nXIwzwDyWwRDH185NuzofJAzT5xvrXIAJhW95zEBvBpcKtI60RgYMGEqUiVUqsNCi8nZVL5uRTq0zMAgvOp5h8UPCAhyvWT58fGy37mJhsvBZTbrVgwShzEjLAMTWhE373iICIOLvXdl1cSUspZHNjA-HKY5lifJUUBhoOcpWDkMl5XxhVe3z5uNLSi2ld0aJyJ23tkJIwexxLEDZcJf9-M_OfPX3_Y9flxXi2fH_qLC1JpU0R3FMFhNsizZgkWUidWiGavBGiTRzxvbZA7aHWj4FEtdfjtFYp90SREbsA6OMARtFN194LakSlt2VJ9K2kXhukT5Q6zekPlJ6D1uQJxM37PWqN5K7zyaML3_A7D5VbGJUhZCETzFy-M1abL98YOt68Rd8Ggttm7A7PCxPS4qAq0X_njzqaScMnBD995M6zVFDcBLSHM-PSZ7IraCbJn2kjyHVBpmFCHS7mrEeJzGGZYs96Z2PXSj_fv-9R8Dly2BramIoalmN-K8bYt4N6hO6bjFrhZXi8TQzQwp58uqGEEETKC-XJFOEb-oWQwmuDkidfCKb13dBBIlc0iq9H__CvzMzflKgc_lanbupl9nL36TtvxvmyBGTL73yu3rcd0P9byd-asieieSU-83vGpVFX9rPUPFGIqSEUmdSZuBI2BULdU1FzBhJEvfG6Embfu0jJtAX_SZGx9OWcmIQ668JyCu2buNf1H0Gle1gvbRIc8Qc_uGAxkHUvKeuqyvNotmC4Fn9lz10J9lErbrY1nQkT__CWPFReo9m10MgHjZW2oJdSfzGwLgJGOfJCl5iIsEbqwR6gZn30vD1pjiXiv0MJ5_kWS-c7SctfdGv0Kzhj13FQecZA_uLj0Yovb0zSm8Eq4tkG-kJq8JGsmsud9r2uq81tG6KQ_VidIJSsKMTDWVTYJ-YKC0GDmj75g7RADFdTIV30YU1fIqA8f7dQSfI1V4p7K_zfjv_8DK_4ja-4KAAA=';
+                var exampleGroupId = 'be8908da-da25-452e-b220-163f52476cdd';
+                var exampleReportId = '8a5b15cc-e026-4d5d-94c0-db5091d65614';
+                var exampleEmbededURL = 'https://app.powerbi.com/reportEmbed';
+
+                $('#exampleEmbededURL').val(exampleEmbededURL);
+                $('#exampleGroupId').val(exampleGroupId);
+                $('#exampleReportId').val(exampleReportId);
+                $('#exampleToken').val(exampleToken);
+            }
+
+        </script>
+    </body>
+</html>
