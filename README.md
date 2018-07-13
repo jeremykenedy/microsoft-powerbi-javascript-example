@@ -17,6 +17,7 @@ This is an example of the [powerbi-client API](https://microsoft.github.io/Power
 
 ## API Call Requirements
 In order to make an API request to Microsoft PowerBI You will need the following basic information for your request (obtained from PowerBI as outline [here](https://github.com/Microsoft/PowerBI-Developer-Samples#step-1---app-registration)):
+
 | Name | Desc | Required|
 | :------------ | :------------ | :------------ |
 |Embed Token|The API Token that is ties the PowerBI Account to the request.| YES |
