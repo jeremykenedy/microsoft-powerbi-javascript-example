@@ -4,7 +4,7 @@ Table of Contents:
 - [About](#about)
 - [API Call Requirements](#api-call-requirements)
 - [Examples](#examples)
-- [Libraries Used](#Libraries-used)
+- [Libraries Used](#libraries-used)
 - [File Tree](#file-tree)
 - [Resources](#resources)
 - [License](#license)
